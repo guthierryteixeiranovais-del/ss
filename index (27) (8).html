@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teixeira Panel</title>
+<style>
+*{box-sizing:border-box;font-family:Arial, sans-serif}
+body{
+  margin:0;
+  background:radial-gradient(circle at top, #16001f, #050008 70%);
+  color:#fff;
+  overflow:hidden;
+}
+
+/* Fundo partículas */
+#bg{position:fixed;inset:0;z-index:0}
+
+/* Container */
+.container{
+  position:relative;z-index:1;
+  width:92%;max-width:430px;
+  margin:20px auto;
+  background:linear-gradient(180deg,#0f0016,#07000b);
+  border-radius:28px;
+  padding:16px;
+  border:1px solid #8a2be255;
+  box-shadow:0 0 60px #8a2be299, inset 0 0 20px #000;
+  backdrop-filter: blur(6px);
+}
+
+/* Header */
+.header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.avatar{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,#8a2be2,#c9a6ff);
+  box-shadow:0 0 24px #8a2be2;
+}
+.name{
+  font-size:22px;font-weight:bold;
+  color:#f0e6ff;text-shadow:0 0 12px #8a2be2;
+}
+
+/* Item */
+.item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px;margin:10px 0;border-radius:20px;
+  background:linear-gradient(180deg,#120018,#0a000f);
+  border:1px solid #8a2be244;
+  box-shadow:0 0 18px #8a2be233, inset 0 0 10px #000;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.item:active{transform:scale(.98);box-shadow:0 0 26px #8a2be266}
+
+.left{display:flex;gap:12px;align-items:center}
+.icon{
+  width:38px;height:38px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  background:#2a0036;
+  box-shadow:0 0 14px #8a2be2;
+  font-size:18px;
+}
+.texts b{color:#f5ecff}
+.texts small{color:#c2a6ff}
+
+/* Switch */
+.switch{position:relative;width:54px;height:30px}
+.switch input{display:none}
+.slider{
+  position:absolute;inset:0;border-radius:20px;
+  background:#3a1a4f;transition:.25s;
+  box-shadow:inset 0 0 8px #000;
+}
+.slider:before{
+  content:"";position:absolute;width:24px;height:24px;
+  left:3px;top:3px;border-radius:50%;
+  background:#fff;transition:.25s;
+}
+.switch input:checked + .slider{
+  background:linear-gradient(90deg,#8a2be2,#c9a6ff);
+  box-shadow:0 0 16px #8a2be2;
+}
+.switch input:checked + .slider:before{transform:translateX(24px)}
+
+/* Footer */
+.footer{display:flex;gap:12px;margin-top:16px}
+.btn{
+  flex:1;padding:14px;border-radius:18px;border:none;
+  font-weight:bold;cursor:pointer;font-size:16px;
+}
+.btn.func{
+  background:#5a2fa0;color:#fff;
+  box-shadow:0 0 16px #8a2be2;
+}
+.btn.inject{
+  background:linear-gradient(90deg,#8a2be2,#c9a6ff);
+  color:#000;box-shadow:0 0 28px #8a2be2;
+}
+
+/* Overlay Injeção */
+.overlay{
+  position:fixed;inset:0;z-index:10;
+  background:radial-gradient(circle at center, #1a0026, #000 70%);
+  display:none;align-items:center;justify-content:center;
+  flex-direction:column;gap:18px;
+  padding:20px;
+}
+.ring{
+  width:140px;height:140px;border-radius:50%;
+  border:4px solid transparent;
+  border-top:4px solid #8a2be2;
+  border-right:4px solid #c9a6ff;
+  animation:spin 1.2s linear infinite;
+  box-shadow:0 0 30px #8a2be2;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulse{
+  position:absolute;width:220px;height:220px;border-radius:50%;
+  border:2px solid #8a2be255;
+  animation:pulse 1.6s ease-out infinite;
+}
+@keyframes pulse{
+  from{transform:scale(.6);opacity:1}
+  to{transform:scale(1.3);opacity:0}
+}
+
+.loading-title{
+  color:#f0e6ff;font-weight:bold;letter-spacing:2px;
+  text-shadow:0 0 12px #8a2be2;
+}
+
+.progress{
+  width:100%;max-width:320px;height:12px;
+  background:#2a0a3a;border-radius:10px;overflow:hidden;
+  box-shadow:inset 0 0 8px #000;
+}
+.bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,#8a2be2,#c9a6ff);
+  box-shadow:0 0 10px #8a2be2;
+  transition:width .3s;
+}
+
+.list{
+  max-width:320px;width:100%;
+  color:#cdb6ff;font-size:14px;
+  text-align:left;
+}
+
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:30px;
+  transform:translateX(-50%) translateY(20px);
+  background:linear-gradient(90deg,#8a2be2,#c9a6ff);
+  color:#000;padding:12px 20px;border-radius:14px;
+  font-weight:bold;box-shadow:0 0 20px #8a2be2;
+  opacity:0;transition:.25s;z-index:20;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="container">
+  <div class="header">
+    <div class="avatar"></div>
+    <div class="name">Teixeira</div>
+  </div>
+
+  <div class="item">
+    <div class="left"><div class="icon">🎯</div><div class="texts"><b>Aimbot</b><br><small>Mira inteligente</small></div></div>
+    <label class="switch"><input type="checkbox" data-name="Aimbot"><span class="slider"></span></label>
+  </div>
+
+  <div class="item">
+    <div class="left"><div class="icon">🔫</div><div class="texts"><b>No Recoil</b><br><small>Sem recuo</small></div></div>
+    <label class="switch"><input type="checkbox" data-name="No Recoil"><span class="slider"></span></label>
+  </div>
+
+  <div class="item">
+    <div class="left"><div class="icon">⚡</div><div class="texts"><b>FPS Boost</b><br><small>Mais fluidez</small></div></div>
+    <label class="switch"><input type="checkbox" data-name="FPS Boost"><span class="slider"></span></label>
+  </div>
+
+  <div class="item">
+    <div class="left"><div class="icon">🧠</div><div class="texts"><b>Neural Aim</b><br><small>Ajuste automático</small></div></div>
+    <label class="switch"><input type="checkbox" data-name="Neural Aim"><span class="slider"></span></label>
+  </div>
+
+  <div class="item">
+    <div class="left"><div class="icon">🚀</div><div class="texts"><b>Auto Performance</b><br><small>Desempenho máximo</small></div></div>
+    <label class="switch"><input type="checkbox" data-name="Auto Performance"><span class="slider"></span></label>
+  </div>
+
+  <div class="footer">
+    <button class="btn func">Funções</button>
+    <button class="btn inject" id="injectBtn">Injeção</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="pulse"></div>
+  <div class="ring"></div>
+  <div class="loading-title" id="loadingText">CONECTANDO...</div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div class="list" id="list"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// Partículas de fundo
+const canvas=document.getElementById("bg"),ctx=canvas.getContext("2d");
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+window.addEventListener("resize",resize);resize();
+const parts=Array.from({length:240},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,s:1+Math.random()*2,v:0.4+Math.random()*1.2}));
+function anim(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="#8a2be2";
+  parts.forEach(p=>{
+    ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,Math.PI*2);ctx.fill();
+    p.y+=p.v;if(p.y>canvas.height){p.y=0;p.x=Math.random()*canvas.width}
+  });
+  requestAnimationFrame(anim);
+}
+anim();
+
+// Toast
+const toast=document.getElementById("toast");let tmr=null;
+function showToast(txt){
+  toast.textContent=txt;toast.classList.add("show");
+  clearTimeout(tmr);tmr=setTimeout(()=>toast.classList.remove("show"),1600);
+}
+
+// Switch mensagens
+document.querySelectorAll('input[type="checkbox"]').forEach(ch=>{
+  ch.addEventListener("change",()=>{
+    const name=ch.dataset.name;
+    if(ch.checked) showToast(name+" ativado!");
+    else showToast(name+" desativado!");
+  });
+});
+
+// Injeção
+const overlay=document.getElementById("overlay");
+const bar=document.getElementById("bar");
+const list=document.getElementById("list");
+const loadingText=document.getElementById("loadingText");
+
+document.getElementById("injectBtn").addEventListener("click",()=>{
+  // pega opções marcadas
+  const checked=[...document.querySelectorAll('input[type="checkbox"]:checked')].map(i=>i.dataset.name);
+
+  list.innerHTML = "<b>Carregando funções:</b><br>" + (checked.length? checked.map(n=>"• "+n).join("<br>") : "• Nenhuma");
+
+  overlay.style.display="flex";
+  bar.style.width="0%";
+
+  const steps=["CONECTANDO...","SINCRONIZANDO...","CARREGANDO MÓDULOS...","FINALIZANDO..."];
+  let step=0;
+  let progress=0;
+
+  const interval=setInterval(()=>{
+    progress+=10;
+    bar.style.width=progress+"%";
+    if(progress%30===0 && step<steps.length){
+      loadingText.textContent=steps[step++];
+    }
+    if(progress>=100){
+      clearInterval(interval);
+      setTimeout(()=>{
+        overlay.style.display="none";
+        // tenta abrir o Free Fire MAX
+        window.location.href="freefiremax://";
+      },600);
+    }
+  },300);
+});
+</script>
+
+</body>
+</html>
